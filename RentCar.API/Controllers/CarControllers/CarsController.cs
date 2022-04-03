@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using RentCar.Database;
 using RentCar.Database.Entities.CarEntities;
-using RentCar.Database.Entities.OrderEntities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,7 +24,7 @@ namespace RentCar.API.Controllers.CarControllers
         [HttpGet]
         public IActionResult Get()
         {
-            var result = _dbContext.Car.ToList();               
+            var result = _dbContext.Car.ToList();
             return Ok(result);
         }
 

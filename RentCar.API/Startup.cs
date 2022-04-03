@@ -1,18 +1,18 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RentCar.Database;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace RentCar.API
 {
@@ -42,7 +42,69 @@ namespace RentCar.API
                     Title = "RentCar API",
                     Description = "API that contains methods for Rent Car system"
                 });
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert JWT with Bearer info field.\n\nExample: Bearer qwertyuiop",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(o =>
+                {
+                    o.Audience = "https://localhost:9001";
+                    o.Authority = "http://localhost:8082/realms/myrealm";
+                    o.RequireHttpsMetadata = false;
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidateIssuer = true,
+                        ValidateLifetime = true,
+                        ValidIssuer = "http://localhost:8082/realms/myrealm",
+                        ValidAudience = "https://localhost:9001"
+                    };
+
+                    o.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = ctx =>
+                        {
+                            ctx.Fail(ctx.Exception);
+                            ctx.Response.StatusCode = 401;
+                            ctx.Response.ContentType = "application/json";
+
+                            return ctx.Response.WriteAsync(JsonSerializer.Serialize(new
+                            {
+                                StatusCode = 401,
+                                Message = ctx.Exception.Message
+                            }));
+                        }
+                    };
+                });
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy("Emp", p => p.Requirements.Add(new RoleRequirement("rentcar_admin")));
+            });
+            services.AddTransient<IAuthorizationHandler, RequireRoleHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +125,7 @@ namespace RentCar.API
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

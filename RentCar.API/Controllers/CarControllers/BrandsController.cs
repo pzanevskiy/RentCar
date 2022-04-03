@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RentCar.Database;
 using RentCar.Database.Entities.CarEntities;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,14 +22,23 @@ namespace RentCar.API.Controllers.CarControllers
         }
 
 
+        [Authorize(Roles = "rentcar_admin")]
         [HttpGet]
         [Produces(typeof(IEnumerable<Brand>))]
         public IActionResult Get()
         {
+            var x = HttpContext.Request.Headers["Authorization"].ToString().Split(" ");
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(x[1]);
             var result = _dbContext.Brand.ToList();
-            return Ok(result);
+            return Ok(new
+            {
+                Token = token.Audiences,
+                result
+            });
         }
 
+        [Authorize(Roles = "rentcar_admin")]
         [HttpGet("/api/brands/models")]
         public IActionResult GetCarsWithModels()
         {
