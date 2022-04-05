@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RentCar.API.Extensions;
 using RentCar.Database;
 using System;
 using System.Text.Json;
@@ -68,43 +70,8 @@ namespace RentCar.API
                     }
                 });
             });
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o =>
-                {
-                    o.Audience = "https://localhost:9001";
-                    o.Authority = "http://localhost:8082/realms/myrealm";
-                    o.RequireHttpsMetadata = false;
-                    o.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidateIssuer = true,
-                        ValidateLifetime = true,
-                        ValidIssuer = "http://localhost:8082/realms/myrealm",
-                        ValidAudience = "https://localhost:9001"
-                    };
-
-                    o.Events = new JwtBearerEvents
-                    {
-                        OnAuthenticationFailed = ctx =>
-                        {
-                            ctx.Fail(ctx.Exception);
-                            ctx.Response.StatusCode = 401;
-                            ctx.Response.ContentType = "application/json";
-
-                            return ctx.Response.WriteAsync(JsonSerializer.Serialize(new
-                            {
-                                StatusCode = 401,
-                                Message = ctx.Exception.Message
-                            }));
-                        }
-                    };
-                });
-            services.AddAuthorization(o =>
-            {
-                o.AddPolicy("Emp", p => p.Requirements.Add(new RoleRequirement("rentcar_admin")));
-            });
-            services.AddTransient<IAuthorizationHandler, RequireRoleHandler>();
+            services.AddAuthenticationServices(Configuration);
+            services.AddCorsServices(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -124,6 +91,8 @@ namespace RentCar.API
             });
 
             app.UseRouting();
+
+            app.UseCors(Configuration);
 
             app.UseAuthentication();
             app.UseAuthorization();
