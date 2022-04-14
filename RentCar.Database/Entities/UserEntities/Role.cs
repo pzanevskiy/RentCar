@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace RentCar.Database.Entities.UserEntities
 {
@@ -14,6 +13,6 @@ namespace RentCar.Database.Entities.UserEntities
 
         public string Name { get; set; }
 
-        public virtual ICollection<UsersRoles> UsersRoles { get; set; }
+        public virtual IList<UsersRoles> UsersRoles { get; set; }
     }
 }

@@ -1,11 +1,10 @@
-﻿using RentCar.Database.Entities.OrderEntities;
+﻿using RentCar.Database.Entities.CarEntities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
-namespace RentCar.Database.Entities.CarEntities
+namespace RentCar.Database.Entities.LocationEntities
 {
     public class City
     {

@@ -1,11 +1,8 @@
-﻿using RentCar.Database.Entities.CarEntities;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
-namespace RentCar.Database.Entities.OrderEntities
+namespace RentCar.Database.Entities.LocationEntities
 {
     public class Address
     {

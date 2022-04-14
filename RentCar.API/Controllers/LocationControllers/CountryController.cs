@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RentCar.API.Models;
 using RentCar.Database;
+using RentCar.Database.Entities.LocationEntities;
 using System;
 using System.Linq;
 
@@ -26,7 +27,7 @@ namespace RentCar.API.Controllers.LocationControllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("id")]
         public IActionResult Get(Guid id)
         {
             var result = _dbContext.Country.FirstOrDefault(x => x.CountryId == id);
@@ -36,7 +37,7 @@ namespace RentCar.API.Controllers.LocationControllers
         [HttpPost]
         public IActionResult Post([FromForm] PostCountryModelRequest model)
         {
-            _dbContext.Country.Add(new Database.Entities.CarEntities.Country()
+            _dbContext.Country.Add(new Country()
             {
                 CountryName = model.CountryName
             });

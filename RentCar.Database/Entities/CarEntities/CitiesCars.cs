@@ -14,11 +14,9 @@ namespace RentCar.Database.Entities.CarEntities
 
         [ForeignKey("CityId")]
         public Guid CityId { get; set; }
-        public virtual City City { get; set; }
 
         [ForeignKey("CarId")]
         public Guid CarId { get; set; }
-        public virtual Car Car { get; set; }
 
         public double Price { get; set; }
     }

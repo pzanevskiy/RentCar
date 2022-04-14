@@ -97,6 +97,8 @@ namespace RentCar.API
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMiddleware<CheckUserMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

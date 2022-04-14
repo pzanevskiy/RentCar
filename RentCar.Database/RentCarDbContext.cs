@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RentCar.Database.Entities.CarEntities;
+using RentCar.Database.Entities.LocationEntities;
 using RentCar.Database.Entities.OrderEntities;
 using RentCar.Database.Entities.UserEntities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RentCar.Database
 {

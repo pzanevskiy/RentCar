@@ -1,16 +1,13 @@
-﻿using RentCar.Database.Entities.OrderEntities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace RentCar.Database.Entities.UserEntities
 {
     public class User
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid UserId { get; set; }
 
         public string FirstName { get; set; }
@@ -21,14 +18,11 @@ namespace RentCar.Database.Entities.UserEntities
 
         public string Email { get; set; }
 
-        [ForeignKey("AddressId")]
-        public Guid? AddressId { get; set; }
-        public OrderEntities.Address Address { get; set; }
+        [ForeignKey("LoyaltyProgramId")]
+        public Guid? LoyaltyProgramId { get; set; }
 
-        public double? Rating { get; set; }
+        public virtual LoyaltyProgram LoyaltyProgram { get; set; }
 
-        public LoyaltyProgram Loyalty { get; set; }
-
-        public virtual ICollection<UsersRoles> UsersRoles { get; set; }
+        public virtual IList<UsersRoles> UsersRoles { get; set; }
     }
 }

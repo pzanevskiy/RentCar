@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace RentCar.Database.Entities.UserEntities
 {
@@ -14,7 +12,7 @@ namespace RentCar.Database.Entities.UserEntities
 
         [ForeignKey("RoleId")]
         public Guid RoleId { get; set; }
-        
+
         public Role Role { get; set; }
 
         [ForeignKey("UserId")]
