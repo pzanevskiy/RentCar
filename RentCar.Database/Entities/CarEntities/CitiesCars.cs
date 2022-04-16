@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace RentCar.Database.Entities.CarEntities
 {
@@ -17,6 +15,7 @@ namespace RentCar.Database.Entities.CarEntities
 
         [ForeignKey("CarId")]
         public Guid CarId { get; set; }
+        public virtual Car Car { get; set; }
 
         public double Price { get; set; }
     }

@@ -37,13 +37,9 @@ namespace RentCar.API.Controllers.CarControllers
 
         // POST api/<ModelsController>
         [HttpPost]
-        public IActionResult Post([FromForm] PostCarModelRequest model)
+        public IActionResult Post([FromForm] CarModel model)
         {
-            _ = _dbContext.CarModel.Add(new CarModel()
-            {
-                ModelName = model.Model,
-                BrandId = model.BrandId
-            });
+            _dbContext.CarModel.Add(model);
             _dbContext.SaveChanges();
             return Ok();
         }

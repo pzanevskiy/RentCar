@@ -56,6 +56,7 @@ namespace RentCar.API.Controllers.CarControllers
         }
 
         // POST api/<BrandsController>
+        [Authorize(Roles = "rentcar_admin")]
         [HttpPost]
         public IActionResult Post([FromForm] Brand brand)
         {

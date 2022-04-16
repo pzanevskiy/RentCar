@@ -29,5 +29,7 @@ namespace RentCar.Database.Entities.CarEntities
         public bool AC { get; set; }
 
         public int BagsCount { get; set; }
+
+        public virtual CitiesCars CitiesCars { get; set; }
     }
 }
