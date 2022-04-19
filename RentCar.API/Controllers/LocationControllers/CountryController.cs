@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RentCar.API.Models;
+using RentCar.API.Models.Response.Location;
 using RentCar.Database;
 using RentCar.Database.Entities.LocationEntities;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,6 +27,28 @@ namespace RentCar.API.Controllers.LocationControllers
         public IActionResult Get()
         {
             var result = _dbContext.Country.ToList();
+            return Ok(result);
+        }
+
+        [HttpGet("tree")]
+        public async Task<IActionResult> GetCountriesTreeView()
+        {
+            var result = await _dbContext.Country.Include(x => x.Cities).ThenInclude(x => x.Addresses)
+                .Select(x => new CountryViewModel
+                {
+                    CountryId = x.CountryId,
+                    CountryName = x.CountryName,
+                    Cities = x.Cities.Select(y => new CityViewModel
+                    {
+                        CityId = y.CityId,
+                        CityName = y.CityName,
+                        Addresses = y.Addresses.Select(z => new AddressViewModel
+                        {
+                            AddressId = z.OrderAddressId,
+                            Addresss = z.OrderAddressName
+                        })
+                    }),
+                }).ToListAsync();
             return Ok(result);
         }
 

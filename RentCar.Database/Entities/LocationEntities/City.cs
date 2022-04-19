@@ -16,11 +16,11 @@ namespace RentCar.Database.Entities.LocationEntities
 
         [ForeignKey("CountryId")]
         public Guid CountryId { get; set; }
-
-        public Country Country { get; set; }
+     
+        public virtual Country Country { get; set; }
 
         public virtual ICollection<Car> Cars { get; set; }
 
-        public virtual ICollection<Address> OrderAddresses { get; set; }
+        public virtual ICollection<Address> Addresses { get; set; }
     }
 }

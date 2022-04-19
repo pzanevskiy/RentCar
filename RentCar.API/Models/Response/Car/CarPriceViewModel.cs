@@ -2,7 +2,7 @@
 
 namespace RentCar.API.Models.Response.Car
 {
-    public class CarModelDTO
+    public class CarPriceViewModel
     {
         public Guid CarId { get; set; }
 

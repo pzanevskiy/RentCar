@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RentCar.API.Models;
 using RentCar.Database;
+using RentCar.Database.Entities.OrderEntities;
 using System;
 using System.Linq;
 
@@ -35,7 +36,7 @@ namespace RentCar.API.Controllers.OrderController
         [HttpPost]
         public IActionResult Post([FromForm] PostEnhancementModelRequest model)
         {
-            _ = _dbContext.Enhancement.Add(new Database.Entities.OrderEntities.Enhancement()
+            _ = _dbContext.Enhancement.Add(new Enhancement()
             {
                 Description = model.Description,
                 Price = model.Price

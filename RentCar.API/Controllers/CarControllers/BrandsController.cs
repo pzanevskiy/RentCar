@@ -27,15 +27,8 @@ namespace RentCar.API.Controllers.CarControllers
         [Produces(typeof(IEnumerable<Brand>))]
         public IActionResult Get()
         {
-            var x = HttpContext.Request.Headers["Authorization"].ToString().Split(" ");
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(x[1]);
             var result = _dbContext.Brand.ToList();
-            return Ok(new
-            {
-                Token = token.Audiences,
-                result
-            });
+            return Ok(result);
         }
 
         [Authorize(Roles = "rentcar_admin")]

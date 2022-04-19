@@ -29,10 +29,9 @@ namespace RentCar.API.Controllers.CarControllers
         public async Task<IActionResult> GetCar()
         {
             var cars = await _context.Car
-                .Include(x => x.CitiesCars)
                 .Include(x => x.CarType)
                 .Include(x => x.Model).ThenInclude(x => x.Brand)
-                .Select(x => new CarModelDTO
+                .Select(x => new CarViewModel
                 {
                     CarId = x.CarId,
                     Brand = x.Model.Brand.BrandName,
@@ -42,12 +41,11 @@ namespace RentCar.API.Controllers.CarControllers
                     DoorsCount = x.DoorsCount,
                     SeatsCount = x.SeatsCount,
                     BagsCount = x.BagsCount,
-                    AC = x.AC,
-                    Price = x.CitiesCars.Price
+                    AC = x.AC
                 })
                 .ToListAsync();
 
-            return Ok(new GetCarsResponse { Cars = cars });
+            return Ok(cars);
         }
 
         [HttpGet("/api/Cars/all")]
@@ -67,7 +65,7 @@ namespace RentCar.API.Controllers.CarControllers
                 .Include(x => x.CarType)
                 .Include(x => x.Model).ThenInclude(x => x.Brand)
                 .Where(x => x.CitiesCars.CityId == cityId)
-                .Select(x => new CarModelDTO
+                .Select(x => new CarPriceViewModel
                 {
                     CarId = x.CarId,
                     Brand = x.Model.Brand.BrandName,
@@ -145,7 +143,7 @@ namespace RentCar.API.Controllers.CarControllers
 
         // DELETE: api/Cars/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Car>> DeleteCar(Guid id)
+        public async Task<ActionResult<Car>> DeleteCar([FromQuery] Guid id)
         {
             var car = await _context.Car.FindAsync(id);
             if (car == null)

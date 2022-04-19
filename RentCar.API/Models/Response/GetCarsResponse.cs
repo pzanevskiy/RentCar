@@ -5,6 +5,6 @@ namespace RentCar.API.Models.Response
 {
     public class GetCarsResponse
     {
-        public IEnumerable<CarModelDTO> Cars { get; set; }
+        public IEnumerable<CarPriceViewModel> Cars { get; set; }
     }
 }
