@@ -1,4 +1,4 @@
-﻿namespace RentCar.API.Models
+﻿namespace RentCar.API.Models.Request
 {
     public class PostEnhancementModelRequest
     {

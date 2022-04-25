@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RentCar.API.Models;
+using RentCar.API.Models.Request;
 using RentCar.Database;
 using RentCar.Database.Entities.CarEntities;
 using System;
@@ -35,6 +35,12 @@ namespace RentCar.API.Controllers.CarControllers
             return Ok(result);
         }
 
+        [HttpGet("brand/{id}")]
+        public IActionResult GetModelsByBrandId(Guid id)
+        {
+            var result = _dbContext.CarModel.Where(x => x.BrandId == id).ToList();
+            return Ok(result);
+        }
         // POST api/<ModelsController>
         [HttpPost]
         public IActionResult Post([FromForm] CarModel model)

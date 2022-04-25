@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RentCar.API.Models.Request;
 using RentCar.API.Models.Response;
 using RentCar.API.Models.Response.Car;
 using RentCar.Database;
@@ -85,7 +86,7 @@ namespace RentCar.API.Controllers.CarControllers
 
         // GET: api/Cars/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Car>> GetCar(Guid id)
+        public async Task<IActionResult> GetCar(Guid id)
         {
             var car = await _context.Car.FindAsync(id);
 
@@ -94,7 +95,18 @@ namespace RentCar.API.Controllers.CarControllers
                 return NotFound();
             }
 
-            return car;
+            return Ok(new CarViewModel
+            {
+                CarId = car.CarId,
+                Brand = car.Model.Brand.BrandName,
+                Model = car.Model.ModelName,
+                Type = car.CarType.TypeName,
+                Transmission = car.Transmission,
+                DoorsCount = car.DoorsCount,
+                SeatsCount = car.SeatsCount,
+                BagsCount = car.BagsCount,
+                AC = car.AC
+            });
         }
 
         // PUT: api/Cars/5
@@ -133,17 +145,32 @@ namespace RentCar.API.Controllers.CarControllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Car>> PostCar([FromForm] Car car)
+        public async Task<ActionResult<Car>> PostCar([FromForm] PostCarRequest carRequest)
         {
+            var modelId = _context.CarModel.Include(x => x.Brand)
+                .FirstOrDefault(x => x.ModelName == carRequest.Model &&
+                    x.Brand.BrandName == carRequest.Brand).ModelId;
+            var typeId = _context.CarType.FirstOrDefault(x => x.TypeName == carRequest.Type).CarTypeId;
+
+            var car = new Car
+            {
+                ModelId = modelId,
+                CarTypeId = typeId,
+                Transmission = carRequest.Transmission,
+                DoorsCount = carRequest.DoorsCount,
+                SeatsCount = carRequest.SeatsCount,
+                BagsCount = carRequest.BagsCount,
+                AC = carRequest.AC
+            };
             _context.Car.Add(car);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCar", new { id = car.CarId }, car);
+            return Ok();
         }
 
         // DELETE: api/Cars/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Car>> DeleteCar([FromQuery] Guid id)
+        public async Task<ActionResult<Car>> DeleteCar(Guid id)
         {
             var car = await _context.Car.FindAsync(id);
             if (car == null)
