@@ -35,7 +35,7 @@ namespace RentCar.API
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
                     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
             });
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo()

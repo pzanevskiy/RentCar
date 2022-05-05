@@ -11,12 +11,12 @@ namespace RentCar.Database.Entities.UserEntities
         public Guid UsersRolesId { get; set; }
 
         [ForeignKey("RoleId")]
-        public Guid RoleId { get; set; }
+        public Guid? RoleId { get; set; }
 
         public Role Role { get; set; }
 
         [ForeignKey("UserId")]
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
 
         public User User { get; set; }
     }

@@ -14,6 +14,7 @@ using RentCar.Database.Entities.CarEntities;
 
 namespace RentCar.API.Controllers.CarControllers
 {
+    [Authorize(Roles = "rentcar_admin, rentcar_user")]
     [Route("api/[controller]")]
     [ApiController]
     public class CarsController : ControllerBase
@@ -27,6 +28,7 @@ namespace RentCar.API.Controllers.CarControllers
 
         // GET: api/Cars
         [HttpGet]
+        [Authorize(Roles = "rentcar_user, rentcar_admin")]
         public async Task<IActionResult> GetCar()
         {
             var cars = await _context.Car
@@ -42,7 +44,8 @@ namespace RentCar.API.Controllers.CarControllers
                     DoorsCount = x.DoorsCount,
                     SeatsCount = x.SeatsCount,
                     BagsCount = x.BagsCount,
-                    AC = x.AC
+                    AC = x.AC,
+                    PictureLink = x.PictureLink
                 })
                 .ToListAsync();
 
@@ -57,7 +60,7 @@ namespace RentCar.API.Controllers.CarControllers
             return Ok(cars);
         }
 
-        [Authorize(Roles = "rentcar_user, rentcar_admin")]
+        //[Authorize(Roles = "rentcar_user, rentcar_admin")]
         [HttpGet("/api/Cars/city/{cityId}")]
         public async Task<IActionResult> GetCarByCityId([FromRoute] Guid cityId)
         {
@@ -65,7 +68,7 @@ namespace RentCar.API.Controllers.CarControllers
                 .Include(x => x.CitiesCars)
                 .Include(x => x.CarType)
                 .Include(x => x.Model).ThenInclude(x => x.Brand)
-                .Where(x => x.CitiesCars.CityId == cityId)
+                .Where(x => x.CitiesCars.Where(y => y.CityId == cityId).Any())
                 .Select(x => new CarPriceViewModel
                 {
                     CarId = x.CarId,
@@ -77,7 +80,8 @@ namespace RentCar.API.Controllers.CarControllers
                     SeatsCount = x.SeatsCount,
                     BagsCount = x.BagsCount,
                     AC = x.AC,
-                    Price = x.CitiesCars.Price
+                    Price = x.CitiesCars.FirstOrDefault(y => y.CarId == x.CarId).Price,
+                    PictureLink = x.PictureLink
                 })
                 .ToListAsync();
 
@@ -88,7 +92,7 @@ namespace RentCar.API.Controllers.CarControllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCar(Guid id)
         {
-            var car = await _context.Car.FindAsync(id);
+            var car = await _context.Car.Include(x => x.CarType).FirstAsync(x => x.CarId == id);
 
             if (car == null)
             {
@@ -98,14 +102,13 @@ namespace RentCar.API.Controllers.CarControllers
             return Ok(new CarViewModel
             {
                 CarId = car.CarId,
-                Brand = car.Model.Brand.BrandName,
-                Model = car.Model.ModelName,
                 Type = car.CarType.TypeName,
                 Transmission = car.Transmission,
                 DoorsCount = car.DoorsCount,
                 SeatsCount = car.SeatsCount,
                 BagsCount = car.BagsCount,
-                AC = car.AC
+                AC = car.AC,
+                PictureLink = car.PictureLink
             });
         }
 
@@ -145,7 +148,7 @@ namespace RentCar.API.Controllers.CarControllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Car>> PostCar([FromForm] PostCarRequest carRequest)
+        public async Task<ActionResult<Car>> PostCar(/*[FromForm]*/ PostCarRequest carRequest)
         {
             var modelId = _context.CarModel.Include(x => x.Brand)
                 .FirstOrDefault(x => x.ModelName == carRequest.Model &&
@@ -160,7 +163,8 @@ namespace RentCar.API.Controllers.CarControllers
                 DoorsCount = carRequest.DoorsCount,
                 SeatsCount = carRequest.SeatsCount,
                 BagsCount = carRequest.BagsCount,
-                AC = carRequest.AC
+                AC = carRequest.AC,
+                PictureLink = carRequest.PictureLink
             };
             _context.Car.Add(car);
             await _context.SaveChangesAsync();

@@ -1,4 +1,5 @@
-﻿using RentCar.Database.Entities.LocationEntities;
+﻿using RentCar.Database.Entities.CarEntities;
+using RentCar.Database.Entities.LocationEntities;
 using RentCar.Database.Entities.UserEntities;
 using System;
 using System.Collections.Generic;
@@ -31,9 +32,9 @@ namespace RentCar.Database.Entities.OrderEntities
         public Guid? UserId { get; set; }
         public virtual User User { get; set; }
 
-        [ForeignKey("DriverId")]
-        public Guid? DriverId { get; set; }
-        public virtual User Driver { get; set; }
+        [ForeignKey("CarId")]
+        public Guid? CarId { get; set; }
+        public virtual Car Car { get; set; }
 
         [ForeignKey("OrderStatusId")]
         public int? OrderStatusId { get; set; }
@@ -41,6 +42,6 @@ namespace RentCar.Database.Entities.OrderEntities
 
         public virtual ICollection<EnhancementsOrders> EnhancementsOrders { get; set; }
 
-        public virtual ICollection<PenaltiesOrders> PenaltiesOrders { get; set; }
+        public virtual ICollection<Penalty> Penalties { get; set; }
     }
 }

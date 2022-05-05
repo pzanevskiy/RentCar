@@ -32,7 +32,7 @@ namespace RentCar.API.Controllers.UserControllers
             var x = _dbContext.User
                 .Select(x => new { x.UserId, x.FirstName, x.LastName, x.PhoneNumber, x.Email })
                 .ToList();
-            return Ok(res);
+            return Ok(x);
         }
 
         [HttpGet("{id}/roles")]

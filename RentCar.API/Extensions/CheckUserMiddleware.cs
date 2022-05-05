@@ -20,55 +20,59 @@ namespace RentCar.API.Extensions
 
         public async Task Invoke(HttpContext context, RentCarDbContext dbContext)
         {
-            var identity = context.User.Identity as ClaimsIdentity;
-            var userId = identity?.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-
-            var user = await dbContext.User.FindAsync(Guid.Parse(userId));
-
-            if (user is null)
+            if (context.User.Identity.IsAuthenticated)
             {
-                dbContext.User.Add(new User
-                {
-                    UserId = Guid.Parse(identity.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value),
-                    FirstName = identity.Claims.First(x => x.Type == ClaimTypes.GivenName).Value,
-                    LastName = identity.Claims.First(x => x.Type == ClaimTypes.Surname).Value,
-                    Email = identity.Claims.First(x => x.Type == ClaimTypes.Email).Value
-                });
-            }
+                var identity = context.User.Identity as ClaimsIdentity;
+                var userId = identity?.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-            var tokenRoles = identity?.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
-            var dbRoles = await dbContext.Role.Select(x => x.Name).ToListAsync();
-            var notExistingRoles = tokenRoles.Except(dbRoles);
+                var user = await dbContext.User.FindAsync(Guid.Parse(userId));
 
-            if (notExistingRoles.Any())
-            {
-                foreach (var role in notExistingRoles)
+                if (user is null)
                 {
-                    dbContext.Role.Add(new Role
+                    dbContext.User.Add(new User
                     {
-                        Name = role
+                        UserId = Guid.Parse(identity.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value),
+                        FirstName = identity.Claims.First(x => x.Type == ClaimTypes.GivenName).Value,
+                        LastName = identity.Claims.First(x => x.Type == ClaimTypes.Surname).Value,
+                        Email = identity.Claims.First(x => x.Type == ClaimTypes.Email).Value
                     });
                 }
-            }
-            await dbContext.SaveChangesAsync();
 
-            var usersRoles = await dbContext.Role.Select(x => x.RoleId).ToListAsync();
+                var tokenRoles = identity?.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
+                var dbRoles = await dbContext.Role.Select(x => x.Name).ToListAsync();
+                var notExistingRoles = tokenRoles.Except(dbRoles);
 
-            foreach (var roleId in usersRoles)
-            {
-                if (!await dbContext.UsersRoles
-                    .AnyAsync(x => x.UserId == Guid.Parse(userId) && x.RoleId == roleId))
+                if (notExistingRoles.Any())
                 {
-                    dbContext.UsersRoles.Add(new UsersRoles
+                    foreach (var role in notExistingRoles)
                     {
-                        UserId = Guid.Parse(userId),
-                        RoleId = roleId
-                    });
+                        dbContext.Role.Add(new Role
+                        {
+                            Name = role
+                        });
+                    }
                 }
-            }
-            await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
+                var usersRoles = await dbContext.Role.Select(x => x.RoleId).ToListAsync();
+
+                foreach (var roleId in usersRoles)
+                {
+                    if (!await dbContext.UsersRoles
+                        .AnyAsync(x => x.UserId == Guid.Parse(userId) && x.RoleId == roleId))
+                    {
+                        dbContext.UsersRoles.Add(new UsersRoles
+                        {
+                            UserId = Guid.Parse(userId),
+                            RoleId = roleId
+                        });
+                    }
+                }
+                await dbContext.SaveChangesAsync();
+
+            }
             await _next(context);
+
         }
     }
 }

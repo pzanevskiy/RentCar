@@ -24,5 +24,7 @@ namespace RentCar.API.Models.Response.Car
         public bool AC { get; set; }
 
         public int BagsCount { get; set; }
+
+        public string PictureLink { get; set; }
     }
 }

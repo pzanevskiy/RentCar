@@ -23,7 +23,7 @@ namespace RentCar.Database
             modelBuilder.Entity<Order>()
                 .HasOne(x => x.User).WithMany().OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Order>()
-                .HasOne(x => x.Driver).WithMany().OnDelete(DeleteBehavior.NoAction);
+                .HasMany(x => x.Penalties).WithOne(x => x.Order).OnDelete(DeleteBehavior.NoAction);
         }
 
         public virtual DbSet<LoyaltyProgram> LoyaltyProgram { get; set; }
@@ -35,7 +35,6 @@ namespace RentCar.Database
         public virtual DbSet<Enhancement> Enhancement { get; set; }
         public virtual DbSet<OrderStatus> OrderStatus { get; set; }
         public virtual DbSet<Order> Order { get; set; }
-        public virtual DbSet<PenaltiesOrders> PenaltiesOrders { get; set; }
         public virtual DbSet<EnhancementsOrders> EnhancementsOrders { get; set; }
 
         public virtual DbSet<Brand> Brand { get; set; }
@@ -47,6 +46,5 @@ namespace RentCar.Database
         public virtual DbSet<Country> Country { get; set; }
         public virtual DbSet<City> City { get; set; }
         public virtual DbSet<Address> Addresses { get; set; }
-
     }
 }

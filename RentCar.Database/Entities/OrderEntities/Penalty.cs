@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,6 +14,8 @@ namespace RentCar.Database.Entities.OrderEntities
 
         public double PenaltyCost { get; set; }
 
-        public virtual ICollection<PenaltiesOrders> PenaltiesOrders { get; set; }
+        [ForeignKey("OrderId")]
+        public Guid? OrderId { get; set; }
+        public virtual Order Order { get; set; }
     }
 }

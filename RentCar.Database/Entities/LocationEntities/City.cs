@@ -19,7 +19,7 @@ namespace RentCar.Database.Entities.LocationEntities
      
         public virtual Country Country { get; set; }
 
-        public virtual ICollection<Car> Cars { get; set; }
+        public virtual ICollection<CitiesCars> Cars { get; set; }
 
         public virtual ICollection<Address> Addresses { get; set; }
     }

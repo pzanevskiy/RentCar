@@ -11,11 +11,11 @@ namespace RentCar.Database.Entities.OrderEntities
         public Guid EnhancementsOrdersId { get; set; }
 
         [ForeignKey("OrderId")]
-        public Guid OrderId { get; set; }
+        public Guid? OrderId { get; set; }
         public virtual Order Order { get; set; }
 
         [ForeignKey("EnhancementId")]
-        public Guid EnhancementId { get; set; }
+        public Guid? EnhancementId { get; set; }
         public virtual Enhancement Enhancement { get; set; }
     }
 }
