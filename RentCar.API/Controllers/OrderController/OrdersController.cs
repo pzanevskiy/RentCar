@@ -44,6 +44,68 @@ namespace RentCar.API.Controllers.OrderController
             return order;
         }
 
+        [HttpGet("user")]
+        public async Task<IActionResult> GetOrderByUserId()
+        {
+            var userId = Guid.Parse(HttpContext.User.Claims
+                .First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+            var order = await _context.Order
+                .Include(x => x.Car).ThenInclude(x => x.Model).ThenInclude(x => x.Brand)
+                .Include(x => x.Car.CarType)
+                .Include(x => x.PickUpAddress).ThenInclude(x => x.City).ThenInclude(x => x.Country)
+                .Include(x => x.ReturnAddress).ThenInclude(x => x.City).ThenInclude(x => x.Country)
+                .Where(x => x.Car.CitiesCars.Any(y => y.CityId == x.PickUpAddress.CityId))
+                .Include(x => x.OrderStatus)
+                .Include(x => x.EnhancementsOrders).ThenInclude(x => x.Enhancement)
+                .Where(x => x.UserId == userId)
+                .Select(x => new
+                {
+                    x.OrderId,
+                    x.UserId,
+                    x.OrderStatus.StatusName,
+                    x.StartDate,
+                    x.EndDate,
+                    x.TotalAmount,
+                    PickUpLocation = string.Join(", ",
+                        x.PickUpAddress.City.Country.CountryName,
+                        x.PickUpAddress.City.CityName,
+                        x.PickUpAddress.OrderAddressName),
+                    ReturnLocation = string.Join(", ",
+                        x.ReturnAddress.City.Country.CountryName,
+                        x.ReturnAddress.City.CityName,
+                        x.ReturnAddress.OrderAddressName),
+                    Car = new
+                    {
+                        CarId = x.CarId,
+                        Brand = x.Car.Model.Brand.BrandName,
+                        Model = x.Car.Model.ModelName,
+                        Type = x.Car.CarType.TypeName,
+                        Price = x.Car.CitiesCars.FirstOrDefault(c => c.CarId == x.CarId).Price,
+                        Transmission = x.Car.Transmission,
+                        SeatsCount = x.Car.SeatsCount,
+                        DoorsCount = x.Car.DoorsCount,
+                        BagsCount = x.Car.BagsCount,
+                        AC = x.Car.AC,
+                        PictureLink = x.Car.PictureLink
+                    },
+                    Enhancements = x.EnhancementsOrders.Select(e => new
+                    {
+                        e.EnhancementId,
+                        e.Enhancement.Description,
+                        e.Enhancement.Price
+                    })
+                })
+                .ToListAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(order);
+        }
+
         // PUT: api/Orders/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
