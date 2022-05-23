@@ -109,13 +109,20 @@ namespace RentCar.API.Controllers.OrderController
         // PUT: api/Orders/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(Guid id, Order order)
+        [HttpPut("status/{id}/{statusName}")]
+        public async Task<IActionResult> PutOrder(Guid id, string statusName)
         {
+            var order = await _context.Order.FindAsync(id);
+
             if (id != order.OrderId)
             {
                 return BadRequest();
             }
+
+            var orderStatus = await _context.OrderStatus
+                .FirstOrDefaultAsync(x => x.StatusName == statusName);
+
+            order.OrderStatusId = orderStatus.OrderStatusId;
 
             _context.Entry(order).State = EntityState.Modified;
 

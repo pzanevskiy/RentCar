@@ -60,7 +60,7 @@ namespace RentCar.API.Controllers.CarControllers
             return Ok(cars);
         }
 
-        //[Authorize(Roles = "rentcar_user, rentcar_admin")]
+        [AllowAnonymous]
         [HttpGet("/api/Cars/city/{cityId}")]
         public async Task<IActionResult> GetCarByCityId([FromRoute] Guid cityId)
         {
