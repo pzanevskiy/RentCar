@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RentCar.API.Models;
 using RentCar.API.Models.Request;
 using RentCar.Database;
@@ -33,13 +34,15 @@ namespace RentCar.API.Controllers.OrderController
             return Ok(result);
         }
 
+        [Authorize(Roles = Consts.Admin)]
         [HttpPost]
-        public IActionResult Post([FromForm] PostPenaltyModelRequest model)
+        public IActionResult Post(PenaltyInfo model)
         {
             _ = _dbContext.Penalty.Add(new Database.Entities.OrderEntities.Penalty()
             {
+                OrderId = model.OrderId,
                 Description = model.Description,
-                PenaltyCost = model.PenaltyCost
+                PenaltyCost = model.ExpirationCost + model.AdditionalCost
             });
             _dbContext.SaveChanges();
             return Ok();

@@ -28,6 +28,10 @@ namespace RentCar.Database.Entities.OrderEntities
 
         public double TotalAmount { get; set; }
 
+        public DateTime DateTimeCreated { get; set; }
+
+        public DateTime DateTimeFinished { get; set; }
+
         [ForeignKey("UserId")]
         public Guid? UserId { get; set; }
         public virtual User User { get; set; }
